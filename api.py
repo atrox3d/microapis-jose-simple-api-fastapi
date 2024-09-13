@@ -1,0 +1,71 @@
+from datetime import datetime, UTC
+import uuid
+from schemas import CreateTaskSchema, GetTaskSchema, ListTasksSchema
+from server import server
+from fastapi import HTTPException, Response, status
+
+TODO = []
+
+@server.get(
+    '/todo', 
+    response_model=ListTasksSchema
+)
+def get_tasks():
+    ''' TODO: check return schema '''
+    return {
+        'tasks': TODO
+    }
+
+server.post(
+    '/todo',
+    response_model=GetTaskSchema,
+    status_code=status.HTTP_201_CREATED
+)
+def create_task(payload:CreateTaskSchema):
+    payload.id = uuid.uuid4()
+    payload.created = datetime.now(UTC)
+    task = payload.model_dump()
+    TODO.append(task)
+    return task
+
+@server.get(
+    '/todo/{taskid}',
+    response_model=GetTaskSchema
+)
+def get_task(task_id:uuid.UUID):
+    for task in TODO:
+        if GetTaskSchema(**task).id == task_id:
+            return task
+    raise HTTPException(
+        status.HTTP_404_NOT_FOUND, 
+        detail=f'{task_id=} not found'
+    )
+
+@server.put(
+    '/todo/{taskid}',
+    response_model=GetTaskSchema
+)
+def update_task(task_id:uuid.UUID, payload:CreateTaskSchema):
+    for task in TODO:
+        if GetTaskSchema(**task).id == task_id:
+            task |= payload
+            return task
+    raise HTTPException(
+        status.HTTP_404_NOT_FOUND, 
+        detail=f'{task_id=} not found'
+    )
+
+@server.delete(
+    '/todo/{taskid}',
+    response_model=Response,
+    status_code=status.HTTP_204_NO_CONTENT
+)
+def update_task(task_id:uuid.UUID):
+    for ndx, task in enumerate(TODO):
+        if GetTaskSchema(**TODO[ndx]).id == task_id:
+            TODO.pop(ndx)
+            return Response()
+    raise HTTPException(
+        status.HTTP_404_NOT_FOUND, 
+        detail=f'{task_id=} not found'
+    )

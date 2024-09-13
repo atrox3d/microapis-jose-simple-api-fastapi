@@ -22,12 +22,12 @@ class Status(StrEnum):
 class CreateTaskSchema(BaseModel):
     priority: Priority | None  = Priority.LOW
     status: Status | None  = Status.PENDING
+    task: str
 
 
 class GetTaskSchema(CreateTaskSchema):
     id: UUID
     created: datetime
-    task: str
 
 
 class ListTasksSchema(BaseModel):
