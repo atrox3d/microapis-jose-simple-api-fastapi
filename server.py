@@ -2,6 +2,7 @@
 from fastapi import FastAPI, Request, Response, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from fastapi.middleware.cors import CORSMiddleware
 from auth import decode_and_validate_token
 import jwt
 
@@ -48,8 +49,15 @@ class AuthorizeRequestMiddleware(BaseHTTPMiddleware):
         else:
             request.state.user_id = token_payload['sub']
         return await call_next(request)
-    
 
+server.add_middleware(AuthorizeRequestMiddleware)
+server.add_middleware(
+    CORSMiddleware,
+    allowed_origins=['*'],
+    allowed_credentials=True,
+    allowed_methods=['*'],
+    allowed_headers=['*']
+)
 
 # print('SERVER | ---- import api -----')
 import api
