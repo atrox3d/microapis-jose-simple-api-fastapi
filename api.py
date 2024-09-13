@@ -1,11 +1,11 @@
-print('API | ------- START ----------')
+# print('API | ------- START ----------')
 
 from datetime import datetime, UTC
 import uuid
 from schemas import CreateTaskSchema, GetTaskSchema, ListTasksSchema
 from fastapi import HTTPException, Response, status
 
-print('API | ---------- IMPORT SERVER ------------')
+# print('API | ---------- IMPORT SERVER ------------')
 from server import server
 
 TODO = []
@@ -79,4 +79,4 @@ def update_task(task_id:uuid.UUID):
         detail=f'{task_id=} not found'
     )
 
-print('API | ------- END ----------')
+# print('API | ------- END ----------')
