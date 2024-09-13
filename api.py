@@ -1,3 +1,5 @@
+print('API | ------- START ----------')
+
 from datetime import datetime, UTC
 import uuid
 from schemas import CreateTaskSchema, GetTaskSchema, ListTasksSchema
@@ -14,6 +16,7 @@ TODO = []
 )
 def get_tasks():
     ''' TODO: check return schema '''
+    print(TODO)
     return {
         'tasks': TODO
     }
@@ -28,6 +31,7 @@ def create_task(payload:CreateTaskSchema):
     task['id'] = uuid.uuid4()
     task['created'] = datetime.now(UTC)
     TODO.append(task)
+    print(task)
     return task
 
 @server.get(
@@ -37,6 +41,7 @@ def create_task(payload:CreateTaskSchema):
 def get_task(task_id:uuid.UUID):
     for task in TODO:
         if GetTaskSchema(**task).id == task_id:
+            print(task)
             return task
     raise HTTPException(
         status.HTTP_404_NOT_FOUND, 
@@ -51,6 +56,7 @@ def update_task(task_id:uuid.UUID, payload:CreateTaskSchema):
     for task in TODO:
         if GetTaskSchema(**task).id == task_id:
             task |= payload
+            print(task)
             return task
     raise HTTPException(
         status.HTTP_404_NOT_FOUND, 
@@ -66,8 +72,11 @@ def update_task(task_id:uuid.UUID):
     for ndx, task in enumerate(TODO):
         if GetTaskSchema(**TODO[ndx]).id == task_id:
             TODO.pop(ndx)
-            return Response()
+            print(TODO)
+            return
     raise HTTPException(
         status.HTTP_404_NOT_FOUND, 
         detail=f'{task_id=} not found'
     )
+
+print('API | ------- END ----------')
