@@ -3,7 +3,7 @@
 from datetime import datetime, UTC
 import uuid
 from schemas import CreateTaskSchema, GetTaskSchema, ListTasksSchema
-from fastapi import HTTPException, Response, status
+from fastapi import HTTPException, Request, Response, status
 
 # print('API | ---------- IMPORT SERVER ------------')
 from server import server
@@ -14,9 +14,11 @@ TODO = []
     '/todo', 
     response_model=ListTasksSchema
 )
-def get_tasks():
+def get_tasks(request:Request):
     ''' TODO: check return schema '''
     print(TODO)
+    # breakpoint()
+    user_id = request.state.user_id
     return {
         'tasks': TODO
     }
