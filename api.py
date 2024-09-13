@@ -1,8 +1,10 @@
 from datetime import datetime, UTC
 import uuid
 from schemas import CreateTaskSchema, GetTaskSchema, ListTasksSchema
-from server import server
 from fastapi import HTTPException, Response, status
+
+print('API | ---------- IMPORT SERVER ------------')
+from server import server
 
 TODO = []
 
@@ -16,15 +18,15 @@ def get_tasks():
         'tasks': TODO
     }
 
-server.post(
+@server.post(
     '/todo',
     response_model=GetTaskSchema,
     status_code=status.HTTP_201_CREATED
 )
 def create_task(payload:CreateTaskSchema):
-    payload.id = uuid.uuid4()
-    payload.created = datetime.now(UTC)
     task = payload.model_dump()
+    task['id'] = uuid.uuid4()
+    task['created'] = datetime.now(UTC)
     TODO.append(task)
     return task
 
@@ -57,7 +59,7 @@ def update_task(task_id:uuid.UUID, payload:CreateTaskSchema):
 
 @server.delete(
     '/todo/{taskid}',
-    response_model=Response,
+    response_class=Response,
     status_code=status.HTTP_204_NO_CONTENT
 )
 def update_task(task_id:uuid.UUID):
