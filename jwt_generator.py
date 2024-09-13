@@ -4,17 +4,19 @@ from pathlib import Path
 from cryptography.hazmat.primitives import serialization
 
 import pem
+import payload_manager
 
 logger = logging.getLogger(__name__)
 
-def create_pems(private_pem:str, public_pem:str):
+def create_pems(private_pem:str, public_pem:str, delete=False):
     ''' creates pem files deleting any existing ones'''
 
-    for pemfile in private_pem, public_pem:
-        pemfile = Path(pemfile)
-        if pemfile.exists():
-            logger.info(f'deleting existing {pemfile}')
-            pemfile.unlink()
+    if delete:
+        for pemfile in private_pem, public_pem:
+            pemfile = Path(pemfile)
+            if pemfile.exists():
+                logger.info(f'deleting existing {pemfile}')
+                pemfile.unlink()
 
     pem.create_pem_keys(cn='jwt-tutorial')
 
@@ -34,16 +36,16 @@ def generate_jwt(payload:dict, private_pem:str):
     return jwt.encode(payload, private_key, 'RS256')
 
 if __name__ == '__main__':
-    # logging.basicConfig(level=logging.INFO)
-    
-    # private_pem = 'private_key.pem'
-    # public_pem = 'public_key.pem'
-    
-    # create_pems(private_pem, public_pem)
-    
-    # payload = payload_manager.load_payload_from_json('payload.json')
-    # payload = payload_manager.add_time_to_payload(payload, hours=24)
-    
-    # token = generate_jwt(payload, private_pem)
-    # print(f'{token = }')
-    pass
+    logging.basicConfig(level=logging.INFO)
+    # 
+    private_pem = 'private_key.pem'
+    public_pem = 'public_key.pem'
+    # 
+    create_pems(private_pem, public_pem)
+    # 
+    payload = payload_manager.load_payload_from_json('payload.json')
+    payload = payload_manager.add_time_to_payload(payload, hours=24)
+    payload = payload_manager.add_uuid_to_payload(payload)
+    # 
+    token = generate_jwt(payload, private_pem)
+    print(f'{token = }')

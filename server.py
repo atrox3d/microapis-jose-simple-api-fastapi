@@ -6,8 +6,13 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 from starlette.middleware.cors import CORSMiddleware
 from auth import decode_and_validate_token
 import jwt
+import yaml
+from pathlib import Path
 
 server = FastAPI(debug=True)
+
+oas_doc = yaml.safe_load(Path('oas.yaml').read_text())
+server.openapi = lambda: oas_doc
 
 public_pem = 'public_key.pem'
 audience = 'http://localhost:8000/orders'
