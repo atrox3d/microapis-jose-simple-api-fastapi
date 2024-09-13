@@ -4,4 +4,4 @@ venv/
 build/
 *.log
 .venv/
-
+*.pem
