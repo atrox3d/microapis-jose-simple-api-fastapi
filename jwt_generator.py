@@ -4,7 +4,6 @@ from pathlib import Path
 from cryptography.hazmat.primitives import serialization
 
 import pem
-# import payload_manager
 
 logger = logging.getLogger(__name__)
 

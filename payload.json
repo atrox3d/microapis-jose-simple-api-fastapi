@@ -1,0 +1,6 @@
+{
+  "iss": "https://auth.coffeemesh.io/",
+  "sub": "fasdf-fasd-fasdf-fasd-fasf",
+  "aud": "http://localhost:8000/orders",
+  "scope": "openid"
+}
