@@ -2,7 +2,8 @@
 from fastapi import FastAPI, Request, Response, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from fastapi.middleware.cors import CORSMiddleware
+# from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.cors import CORSMiddleware
 from auth import decode_and_validate_token
 import jwt
 
@@ -15,7 +16,8 @@ class AuthorizeRequestMiddleware(BaseHTTPMiddleware):
     # async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> api.Response:
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         # return await super().dispatch(request, call_next)
-        if request.url in [ 'docs', '/openapi.json']:
+        print(f'{request.url.path=}')
+        if request.url.path in [ '/docs', '/openapi.json']:
             return await call_next(request)
         if request.method == 'OPTIONS':
             return await call_next(request)
@@ -53,10 +55,10 @@ class AuthorizeRequestMiddleware(BaseHTTPMiddleware):
 server.add_middleware(AuthorizeRequestMiddleware)
 server.add_middleware(
     CORSMiddleware,
-    allowed_origins=['*'],
-    allowed_credentials=True,
-    allowed_methods=['*'],
-    allowed_headers=['*']
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*'],
 )
 
 # print('SERVER | ---- import api -----')
