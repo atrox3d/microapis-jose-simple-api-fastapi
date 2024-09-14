@@ -52,6 +52,15 @@ def load_token(token:str, filepath:str):
     with open(filepath) as fp:
         return fp.read(token)
 
+def save_user_token_to_json(json_path:str, userid:str, token:str):
+    import json
+    data = {
+        'userid': userid,
+        'token': token
+    }
+    with open(json_path, 'w') as jp:
+        json.dump(data, jp)    
+
 def copy_token_to_clipboard(token:str):
     import pyperclip
     pyperclip.copy(token)
@@ -65,6 +74,14 @@ if __name__ == '__main__':
         level=logging.INFO,
         format='%(levelname)s | %(funcName)s | %(message)s'
     )
+
+    try:
+        username, userid = sys.argv[1:]
+        logger.info(f'got {userid = } {username = }')
+    except ValueError:
+        logging.critical('syntax python -m helpers.jwt_generator username userid')
+        exit()
+
     # 
     private_pem = 'private_key.pem'
     public_pem = 'public_key.pem'
@@ -78,15 +95,18 @@ if __name__ == '__main__':
     payload_json = Path(__file__).parent / 'payload.json'
     payload = payload_manager.load_payload_from_json(payload_json)
     payload = payload_manager.add_time_to_payload(payload, hours=24)
-    try:
-        userid = sys.argv[1]
-        logger.info(f'got {userid = }')
-    except IndexError:
-        userid = None
     payload = payload_manager.add_uuid_to_payload(payload, id=userid)
     #
     token = generate_jwt(payload, private_pem)
     print(f'token = \n{token}')
-    token_path = Path(__file__).parent / 'token.txt'
-    save_token(token, token_path)
+    
+    token_path = Path(__file__).parent / f'{username}.txt'
+    save_token(token, token_path)    
+    logger.warning('saved token to txt')
+
     copy_token_to_clipboard(token)
+    logger.warning('copied toke to clipboard')
+
+    json_path = Path(__file__).parent / f'{username}.json'
+    save_user_token_to_json(json_path, userid, token)
+    logger.warning('saved userid and token to json')
