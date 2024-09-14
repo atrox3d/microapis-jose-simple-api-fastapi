@@ -5,7 +5,7 @@ from sqlalchemy.orm import declarative_base, relationship
 Base = declarative_base()
 
 def generate_uuid() -> str:
-    return str(uuid.uuid4)
+    return str(uuid.uuid4())
 
 class DictMixin:
     def dict(self):
