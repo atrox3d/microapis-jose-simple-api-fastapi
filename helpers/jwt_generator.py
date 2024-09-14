@@ -25,8 +25,8 @@ def create_pems(private_pem:str, public_pem:str, *, delete:bool, force_overwrite
                 logger.info(f'deleting existing {pemfile}')
                 pemfile.unlink()
             if not force_overwrite:
-                raise FileExistsError(str(pemfile))
-
+                # raise FileExistsError(str(pemfile))
+                logger.warning(f'{pemfile} exists, use force_overwrite to substitute')
     pem.create_pem_keys(cn='jwt-tutorial')
 
 def generate_jwt(payload:dict, private_pem:str):
@@ -44,6 +44,18 @@ def generate_jwt(payload:dict, private_pem:str):
     logger.info('generating jwt token')
     return jwt.encode(payload, private_key, 'RS256')
 
+def save_token(token:str, filepath:str):
+    with open(filepath, 'w') as fp:
+        fp.write(token)
+
+def load_token(token:str, filepath:str):
+    with open(filepath) as fp:
+        return fp.read(token)
+
+def copy_token_to_clipboard(token:str):
+    import pyperclip
+    pyperclip.copy(token)
+
 if __name__ == '__main__':
     #################################################
     # python -m helpers.jwt_generator
@@ -57,11 +69,11 @@ if __name__ == '__main__':
     private_pem = 'private_key.pem'
     public_pem = 'public_key.pem'
     # 
-    try:
-        create_pems(private_pem, public_pem, delete=False)
-    except FileExistsError as fee:
-        logger.critical(f'{fee} exists: please delete or force overwrite')
-        exit()
+    # try:
+    create_pems(private_pem, public_pem, delete=False)
+    # except FileExistsError as fee:
+        # logger.critical(f'{fee} exists: please delete or force overwrite')
+        # exit()
     #
     payload_json = Path(__file__).parent / 'payload.json'
     payload = payload_manager.load_payload_from_json(payload_json)
@@ -75,3 +87,6 @@ if __name__ == '__main__':
     #
     token = generate_jwt(payload, private_pem)
     print(f'token = \n{token}')
+    token_path = Path(__file__).parent / 'token.txt'
+    save_token(token, token_path)
+    copy_token_to_clipboard(token)

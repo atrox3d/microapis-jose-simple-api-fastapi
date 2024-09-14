@@ -5,3 +5,4 @@ build/
 *.log
 .venv/
 *.pem
+token.txt
