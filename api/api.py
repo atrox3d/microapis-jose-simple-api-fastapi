@@ -38,12 +38,16 @@ def create_task(payload:CreateTaskSchema, request:Request):
 
     with session_maker() as session:
         task = models.Task(
-            **payload.model_dump(),
-            user_id=request.state.user_id,
+            # **payload.model_dump(),
             created=now,
-            updated=now
+            updated=now,
+            priority=payload.priority,
+            status=payload.status,
+            task=payload.task,
+            user_id=request.state.user_id,
         )
         session.add(task)
+        print(f'\n\n\n\n\n{task.dict()}\n\n\n\n\n\n')
         session.commit()
         task = task.dict()
     return task
@@ -56,10 +60,26 @@ def create_task(payload:CreateTaskSchema, request:Request):
     return task
 
 @server.get(
-    '/todo/{taskid}',
+    '/todo/{task_id}',
     response_model=GetTaskSchema
 )
-def get_task(task_id:uuid.UUID):
+def get_task(task_id:uuid.UUID, request:Request):
+    print(f'{task_id = }')
+    with session_maker() as session:
+        task = (
+            session.query(models.Task)
+            .filter(
+                models.User.id==request.state.user_id,
+                models.Task.user_id==request.state.user_id
+            )
+            .first()
+        )
+    if not task:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND, 
+            detail=f'{task_id=} not found'
+        )
+    return task
     for task in TODO:
         if GetTaskSchema(**task).id == task_id:
             print(task)
@@ -70,10 +90,34 @@ def get_task(task_id:uuid.UUID):
     )
 
 @server.put(
-    '/todo/{taskid}',
+    '/todo/{task_id}',
     response_model=GetTaskSchema
 )
-def update_task(task_id:uuid.UUID, payload:CreateTaskSchema):
+def update_task(task_id:uuid.UUID, payload:CreateTaskSchema, request:Request):
+    print('update task')
+    with session_maker() as session:
+        task = (
+            session.query(models.Task)
+            .filter(
+                models.User.id==request.state.user_id,
+                models.Task.user_id==request.state.user_id
+            )
+            .first()
+        )
+        print(f'{task.dict() = }')
+        # task.task = ''
+        if task:
+            task.status = payload.status
+            task.priority = payload.priority
+            task.task = payload.task
+            task.updated = datetime.now(UTC)
+            session.add(task)
+            session.commit()
+            return task.dict()
+    raise HTTPException(
+        status.HTTP_404_NOT_FOUND, 
+        detail=f'{task_id=} not found'
+    )
     for task in TODO:
         if GetTaskSchema(**task).id == task_id:
             task |= payload
@@ -85,11 +129,28 @@ def update_task(task_id:uuid.UUID, payload:CreateTaskSchema):
     )
 
 @server.delete(
-    '/todo/{taskid}',
+    '/todo/{task_id}',
     response_class=Response,
     status_code=status.HTTP_204_NO_CONTENT
 )
-def update_task(task_id:uuid.UUID):
+def delete_task(task_id:uuid.UUID, request:Request):
+    with session_maker() as session:
+        task = (
+            session.query(models.Task)
+            .filter(
+                models.User.id==request.state.user_id,
+                models.Task.user_id==request.state.user_id
+            )
+            .first()
+        )
+        print(task)
+        session.delete(task)
+        session.commit()
+        return
+    raise HTTPException(
+        status.HTTP_404_NOT_FOUND, 
+        detail=f'{task_id=} not found'
+    )
     for ndx, task in enumerate(TODO):
         if GetTaskSchema(**TODO[ndx]).id == task_id:
             TODO.pop(ndx)

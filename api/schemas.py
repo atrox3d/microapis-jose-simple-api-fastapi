@@ -26,7 +26,7 @@ class CreateTaskSchema(BaseModel):
 
 
 class GetTaskSchema(CreateTaskSchema):
-    id: UUID
+    id: UUID | None
     created: datetime
 
 
