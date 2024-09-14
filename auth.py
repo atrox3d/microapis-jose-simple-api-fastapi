@@ -18,11 +18,14 @@ def decode_and_validate_token(access_token:str, public_pem:str, audience:str):
     ).public_key()
     logger.debug(f'{x509_certificate = }')
 
-    return jwt.decode(
+    decoded =  jwt.decode(
         access_token,
         x509_certificate,
         algorithms=unverified_headers['alg'],
         audience=audience
     )
+    print(f'{decoded = }')
+    return decoded
+
 
 
