@@ -1,17 +1,8 @@
 import jwt
 import logging
-from pathlib import Path
 from cryptography.hazmat.primitives import serialization
 
-try:
-    from helpers import pem
-    from helpers import payload_manager
-    from helpers import tokenmanager
-except ModuleNotFoundError:
-    from pathlib import Path
-    module = Path(__file__)
-    print(f'SYNTAX | python -m {module.parent.name}.{module.stem}')
-    exit()
+from helpers import pem
 
 
 logger = logging.getLogger(__name__)
