@@ -39,4 +39,4 @@ class Task(Base):
 
     def dict(self):
         return {col:getattr(self, col) for col in self.__table__.columns.keys()
-                if col in 'id priority status task'.split()}
+                if col in 'id priority status task created'.split()}

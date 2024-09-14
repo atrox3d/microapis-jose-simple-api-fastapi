@@ -7,7 +7,8 @@ from fastapi import HTTPException, Request, Response, status
 from api.schemas import CreateTaskSchema, GetTaskSchema, ListTasksSchema
 
 # print('API | ---------- IMPORT SERVER ------------')
-from api.server import server
+from api.server import server, session_maker
+from data_access import models
 
 TODO = []
 
@@ -29,7 +30,21 @@ def get_tasks(request:Request):
     response_model=GetTaskSchema,
     status_code=status.HTTP_201_CREATED
 )
-def create_task(payload:CreateTaskSchema):
+def create_task(payload:CreateTaskSchema, request:Request):
+    now = datetime.now(UTC)
+
+    with session_maker() as session:
+        task = models.Task(
+            **payload.model_dump(),
+            user_id=request.state.user_id,
+            created=now,
+            updated=now
+        )
+        session.add(task)
+        session.commit()
+        task = task.dict()
+    return task
+    #
     task = payload.model_dump()
     task['id'] = uuid.uuid4()
     task['created'] = datetime.now(UTC)
