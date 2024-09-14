@@ -4,15 +4,20 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 # from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.cors import CORSMiddleware
-from auth import decode_and_validate_token
+from api.auth import decode_and_validate_token
 import jwt
 import yaml
 from pathlib import Path
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 server = FastAPI(debug=True)
 
 oas_doc = yaml.safe_load(Path('oas.yaml').read_text())
 server.openapi = lambda: oas_doc
+
+session_maker = sessionmaker(bind=create_engine('sqlite:///models.db'))
+
 
 public_pem = 'public_key.pem'
 audience = 'http://localhost:8000/orders'
@@ -67,6 +72,6 @@ server.add_middleware(
 )
 
 # print('SERVER | ---- import api -----')
-import api
+from api import api
 
 # print('SERVER | ------- END ----------')

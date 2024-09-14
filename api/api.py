@@ -2,11 +2,12 @@
 
 from datetime import datetime, UTC
 import uuid
-from schemas import CreateTaskSchema, GetTaskSchema, ListTasksSchema
 from fastapi import HTTPException, Request, Response, status
 
+from api.schemas import CreateTaskSchema, GetTaskSchema, ListTasksSchema
+
 # print('API | ---------- IMPORT SERVER ------------')
-from server import server
+from api.server import server
 
 TODO = []
 
