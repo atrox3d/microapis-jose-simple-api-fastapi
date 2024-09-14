@@ -17,25 +17,16 @@ TODO = []
     response_model=ListTasksSchema
 )
 def get_tasks(request:Request):
-    ''' TODO: check return schema '''
-    # print(TODO)
     # breakpoint()
     user_id = request.state.user_id
     with session_maker() as session:
-        # it should be possible to avoid list comprehension
-        # because User.tasks is already a list
-        tasks = [
-            task for task in (                      # create list of tasks
-                session.query(models.User)          # from query users
-                .filter(models.User.id == user_id)  # select current user
-                .first()                            # first record
-                .tasks                              # get tasks
-            )
-        ]
-
-    return {
-        'tasks': tasks
-    }
+        db_tasks = (
+            session.query(models.User)          # from query users
+            .filter(models.User.id == user_id)  # select current user
+            .first()                            # first record
+            .tasks                              # get tasks
+        )
+    return {'tasks': db_tasks}
 
 @server.post(
     '/todo',
