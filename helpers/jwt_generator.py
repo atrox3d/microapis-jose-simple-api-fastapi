@@ -15,20 +15,6 @@ except ModuleNotFoundError:
 
 logger = logging.getLogger(__name__)
 
-def create_pems(private_pem:str, public_pem:str, *, delete:bool, force_overwrite:bool=False):
-    ''' creates pem files deleting any existing ones'''
-
-    for pemfile in private_pem, public_pem:
-        pemfile = Path(pemfile)
-        if pemfile.exists():
-            if delete:
-                logger.info(f'deleting existing {pemfile}')
-                pemfile.unlink()
-            if not force_overwrite:
-                # raise FileExistsError(str(pemfile))
-                logger.warning(f'{pemfile} exists, use force_overwrite to substitute')
-    pem.create_pem_keys(cn='jwt-tutorial')
-
 def generate_jwt(payload:dict, private_pem:str):
     ''' creates jwt token from payload and private pem file'''
 
@@ -87,7 +73,7 @@ if __name__ == '__main__':
     public_pem = 'public_key.pem'
     # 
     # try:
-    create_pems(private_pem, public_pem, delete=False)
+    pem.create_pems(private_pem, public_pem, delete=False)
     # except FileExistsError as fee:
         # logger.critical(f'{fee} exists: please delete or force overwrite')
         # exit()

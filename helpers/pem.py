@@ -36,6 +36,21 @@ def load_pem_key(pem_path:str) -> str:
     logger.debug(f'{pem_path}::{text = }')
     return text
 
+
+def create_pems(private_pem:str, public_pem:str, *, delete:bool, force_overwrite:bool=False):
+    ''' creates pem files deleting any existing ones'''
+
+    for pemfile in private_pem, public_pem:
+        pemfile = Path(pemfile)
+        if pemfile.exists():
+            if delete:
+                logger.info(f'deleting existing {pemfile}')
+                pemfile.unlink()
+            if not force_overwrite:
+                # raise FileExistsError(str(pemfile))
+                logger.warning(f'{pemfile} exists, use force_overwrite to substitute')
+    create_pem_keys(cn='jwt-tutorial')
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     
