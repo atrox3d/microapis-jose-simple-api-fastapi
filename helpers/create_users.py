@@ -1,7 +1,14 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import User
 from datetime import datetime, UTC
+
+try:
+    from data_access.models import User
+except ModuleNotFoundError:
+    from pathlib import Path
+    module = Path(__file__)
+    print(f'SYNTAX | python -m {module.parent.name}.{module.stem}')
+    exit()
 
 users = [
     User(created=datetime.now(UTC), email='haha@haha.com'),
@@ -36,4 +43,8 @@ def create_users(users:list[User], *, delete:bool, print:bool=True):
         print_db_users()
 
 if __name__ == "__main__":
+    #################################################
+    # python -m helpers.create_users
+    #################################################
+    print(f'{__name__ = }')
     create_users(users, delete=True)
