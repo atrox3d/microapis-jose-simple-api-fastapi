@@ -3,4 +3,7 @@ uvicorn
 pyyaml
 pyjwt
 cryptography
+sqlalchemy
+alembic
+
 
