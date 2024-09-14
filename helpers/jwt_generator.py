@@ -6,6 +6,7 @@ from cryptography.hazmat.primitives import serialization
 try:
     from helpers import pem
     from helpers import payload_manager
+    from helpers import tokenmanager
 except ModuleNotFoundError:
     from pathlib import Path
     module = Path(__file__)
@@ -29,27 +30,6 @@ def generate_jwt(payload:dict, private_pem:str):
 
     logger.info('generating jwt token')
     return jwt.encode(payload, private_key, 'RS256')
-
-def save_token(token:str, filepath:str):
-    with open(filepath, 'w') as fp:
-        fp.write(token)
-
-def load_token(token:str, filepath:str):
-    with open(filepath) as fp:
-        return fp.read(token)
-
-def save_user_token_to_json(json_path:str, userid:str, token:str):
-    import json
-    data = {
-        'userid': userid,
-        'token': token
-    }
-    with open(json_path, 'w') as jp:
-        json.dump(data, jp)    
-
-def copy_token_to_clipboard(token:str):
-    import pyperclip
-    pyperclip.copy(token)
 
 if __name__ == '__main__':
     #################################################
@@ -87,12 +67,12 @@ if __name__ == '__main__':
     print(f'token = \n{token}')
     
     token_path = Path(__file__).parent / f'{username}.txt'
-    save_token(token, token_path)    
+    tokenmanager.save_token(token, token_path)    
     logger.warning('saved token to txt')
 
-    copy_token_to_clipboard(token)
+    tokenmanager.copy_token_to_clipboard(token)
     logger.warning('copied toke to clipboard')
 
     json_path = Path(__file__).parent / f'{username}.json'
-    save_user_token_to_json(json_path, userid, token)
+    tokenmanager.save_user_token_to_json(json_path, userid, token)
     logger.warning('saved userid and token to json')
